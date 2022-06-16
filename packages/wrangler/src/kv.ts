@@ -214,7 +214,7 @@ export async function getKVKeyValue(
   accountId: string,
   namespaceId: string,
   key: string
-): Promise<string> {
+): Promise<string | Buffer> {
   return await fetchKVGetValue(accountId, namespaceId, encodeURIComponent(key));
 }
 

@@ -123,7 +123,7 @@ export async function fetchKVGetValue(
   accountId: string,
   namespaceId: string,
   key: string
-): Promise<string> {
+): Promise<string | Buffer> {
   await requireLoggedIn();
   const apiToken = requireApiToken();
   const headers = { Authorization: `Bearer ${apiToken}` };
@@ -132,8 +132,15 @@ export async function fetchKVGetValue(
     method: "GET",
     headers,
   });
+
   if (response.ok) {
-    return await response.text();
+    console.log("response: ", response);
+    const result = await response.text();
+    if (response.headers.get("content-type") === "application/octet-stream") {
+      return Buffer.from(result).toString("binary");
+    }
+
+    return result;
   } else {
     throw new Error(
       `Failed to fetch ${resource} - ${response.status}: ${response.statusText});`
