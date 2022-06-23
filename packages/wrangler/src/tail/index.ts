@@ -1,6 +1,7 @@
 import WebSocket from "ws";
 import { version as packageVersion } from "../../package.json";
 import { fetchResult } from "../cfetch";
+import { getWorkerUrl } from "../create-worker-upload-form";
 import type { TailFilterMessage, Outcome } from "./filters";
 export type { TailCLIFilters } from "./filters";
 export { translateCLICommandToFilterMessage } from "./filters";
@@ -33,9 +34,13 @@ function makeCreateTailUrl(
   workerName: string,
   env: string | undefined
 ): string {
-  return env
-    ? `/accounts/${accountId}/workers/services/${workerName}/environments/${env}/tails`
-    : `/accounts/${accountId}/workers/scripts/${workerName}/tails`;
+  const baseUrl = getWorkerUrl({
+    accountId,
+    scriptName: workerName,
+    envName: env,
+  })
+
+  return `${baseUrl}/tails`;
 }
 
 /**
@@ -54,9 +59,13 @@ function makeDeleteTailUrl(
   tailId: string,
   env: string | undefined
 ): string {
-  return env
-    ? `/accounts/${accountId}/workers/services/${workerName}/environments/${env}/tails/${tailId}`
-    : `/accounts/${accountId}/workers/scripts/${workerName}/tails/${tailId}`;
+  const baseUrl = getWorkerUrl({
+    accountId,
+    scriptName: workerName,
+    envName: env,
+  })
+
+  return `${baseUrl}/tails/${tailId}`;
 }
 
 /**

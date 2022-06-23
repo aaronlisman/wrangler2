@@ -6,6 +6,38 @@ import type {
   CfDurableObjectMigrations,
 } from "./worker.js";
 
+type WorkerReference = {
+  accountId?: string;
+
+  scriptName?: string;
+  envName?: string;
+
+  legacyEnv?: boolean
+
+  namespaceName?: string;
+
+  // notProd means there's an environment specified
+  // and it's not explicitly 'legacy'. if undefined,
+  // it defaults to `envName && !legacyEnv`
+  notProd?: boolean;
+}
+
+export function getWorkerUrl(ref: WorkerReference): string {
+  if (ref.notProd === undefined) {
+    ref.notProd = Boolean(ref.envName && !ref.legacyEnv);
+  }
+
+  if (ref.namespaceName) {
+    return `/accounts/${ref.accountId}/workers/dispatch/namespaces/${ref.namespaceName}/scripts/${ref.scriptName}`;
+  }
+
+  if (ref.notProd) {
+    return `/accounts/${ref.accountId}/workers/services/${ref.scriptName}/environments/${ref.envName}`;
+  }
+
+  return `/accounts/${ref.accountId}/workers/scripts/${ref.scriptName}`;
+}
+
 export function toMimeType(type: CfModuleType): string {
   switch (type) {
     case "esm":

@@ -17,7 +17,7 @@ import makeCLI from "yargs";
 import { version as wranglerVersion } from "../package.json";
 import { fetchResult } from "./cfetch";
 import { findWranglerToml, printBindings, readConfig } from "./config";
-import { createWorkerUploadForm } from "./create-worker-upload-form";
+import { createWorkerUploadForm, getWorkerUrl } from "./create-worker-upload-form";
 import Dev from "./dev/dev";
 import { getVarsForDev } from "./dev/dev-vars";
 import { confirm, prompt, select } from "./dialogs";
@@ -1903,10 +1903,13 @@ function createCLIParser(argv: string[]) {
             );
 
             async function submitSecret() {
-              const url =
-                !args.env || isLegacyEnv(config)
-                  ? `/accounts/${accountId}/workers/scripts/${scriptName}/secrets`
-                  : `/accounts/${accountId}/workers/services/${scriptName}/environments/${args.env}/secrets`;
+              const baseUrl = getWorkerUrl({
+                accountId,
+                scriptName,
+                envName: args.env,
+                legacyEnv: isLegacyEnv(config),
+              })
+              const url = `${baseUrl}/secrets`;
 
               return await fetchResult(url, {
                 method: "PUT",
@@ -1921,10 +1924,14 @@ function createCLIParser(argv: string[]) {
 
             const createDraftWorker = async () => {
               // TODO: log a warning
+              const url = getWorkerUrl({
+                accountId,
+                scriptName,
+                envName: args.env,
+                legacyEnv: isLegacyEnv(config),
+              })
               await fetchResult(
-                !isLegacyEnv(config) && args.env
-                  ? `/accounts/${accountId}/workers/services/${scriptName}/environments/${args.env}`
-                  : `/accounts/${accountId}/workers/scripts/${scriptName}`,
+                url,
                 {
                   method: "PUT",
                   body: createWorkerUploadForm({
@@ -2028,10 +2035,13 @@ function createCLIParser(argv: string[]) {
                 }`
               );
 
-              const url =
-                !args.env || isLegacyEnv(config)
-                  ? `/accounts/${accountId}/workers/scripts/${scriptName}/secrets`
-                  : `/accounts/${accountId}/workers/services/${scriptName}/environments/${args.env}/secrets`;
+              const baseUrl = getWorkerUrl({
+                accountId,
+                scriptName,
+                envName: args.env,
+                legacyEnv: isLegacyEnv(config),
+              })
+              const url = `${baseUrl}/secrets`;
 
               await fetchResult(`${url}/${args.key}`, { method: "DELETE" });
               logger.log(`✨ Success! Deleted secret ${args.key}`);
@@ -2066,10 +2076,13 @@ function createCLIParser(argv: string[]) {
 
             const accountId = await requireAuth(config);
 
-            const url =
-              !args.env || isLegacyEnv(config)
-                ? `/accounts/${accountId}/workers/scripts/${scriptName}/secrets`
-                : `/accounts/${accountId}/workers/services/${scriptName}/environments/${args.env}/secrets`;
+            const baseUrl = getWorkerUrl({
+              accountId,
+              scriptName,
+              envName: args.env,
+              legacyEnv: isLegacyEnv(config),
+            })
+            const url = `${baseUrl}/secrets`;
 
             logger.log(JSON.stringify(await fetchResult(url), null, "  "));
           }

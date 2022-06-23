@@ -1,7 +1,7 @@
 import { URL } from "node:url";
 import { fetch } from "undici";
 import { fetchResult } from "./cfetch";
-import { createWorkerUploadForm } from "./create-worker-upload-form";
+import { createWorkerUploadForm, getWorkerUrl } from "./create-worker-upload-form";
 import { logger } from "./logger";
 import type { CfAccount, CfWorkerContext, CfWorkerInit } from "./worker";
 
@@ -112,10 +112,13 @@ async function createPreviewToken(
 
   const { accountId } = account;
   const scriptId = worker.name || (ctx.zone ? randomId() : host.split(".")[0]);
-  const url =
-    ctx.env && !ctx.legacyEnv
-      ? `/accounts/${accountId}/workers/services/${scriptId}/environments/${ctx.env}/edge-preview`
-      : `/accounts/${accountId}/workers/scripts/${scriptId}/edge-preview`;
+  const baseUrl = getWorkerUrl({
+    accountId,
+    scriptName: scriptId,
+    envName: ctx.env,
+    legacyEnv: ctx.legacyEnv,
+  })
+  const url = `${baseUrl}/edge-preview`;
 
   const mode: CfPreviewMode = ctx.zone
     ? { routes: ["*/*"] } // TODO: should we support routes here? how?
