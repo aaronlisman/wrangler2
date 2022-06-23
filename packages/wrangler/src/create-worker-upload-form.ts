@@ -12,7 +12,7 @@ type WorkerReference = {
   scriptName?: string;
   envName?: string;
 
-  legacyEnv?: boolean
+  legacyEnv?: boolean;
 
   namespaceName?: string;
 
@@ -20,7 +20,7 @@ type WorkerReference = {
   // and it's not explicitly 'legacy'. if undefined,
   // it defaults to `envName && !legacyEnv`
   notProd?: boolean;
-}
+};
 
 export function getWorkerUrl(ref: WorkerReference): string {
   if (ref.notProd === undefined) {

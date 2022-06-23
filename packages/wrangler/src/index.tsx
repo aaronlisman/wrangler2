@@ -17,11 +17,17 @@ import makeCLI from "yargs";
 import { version as wranglerVersion } from "../package.json";
 import { fetchResult } from "./cfetch";
 import { findWranglerToml, printBindings, readConfig } from "./config";
-import { createWorkerUploadForm, getWorkerUrl } from "./create-worker-upload-form";
+import {
+  createWorkerUploadForm,
+  getWorkerUrl,
+} from "./create-worker-upload-form";
 import Dev from "./dev/dev";
 import { getVarsForDev } from "./dev/dev-vars";
 import { confirm, prompt, select } from "./dialogs";
-import { createNamespaceCommand, deleteNamespaceCommand } from "./dispatch/dispatch"
+import {
+  createNamespaceCommand,
+  deleteNamespaceCommand,
+} from "./dispatch/dispatch";
 import { getEntry } from "./entry";
 import { DeprecationError } from "./errors";
 import {
@@ -1076,12 +1082,14 @@ function createCLIParser(argv: string[]) {
           );
         }
 
-        if (config.dispatch_namespaces && config.dispatch_namespaces.length > 0) {
+        if (
+          config.dispatch_namespaces &&
+          config.dispatch_namespaces.length > 0
+        ) {
           logger.warn(
             `This worker is bound to live namespaces: ${config.dispatch_namespaces
               .map(
-                (namespace) =>
-                  `${namespace.binding} (${namespace.namespace})`
+                (namespace) => `${namespace.binding} (${namespace.namespace})`
               )
               .join(", ")}`
           );
@@ -1196,6 +1204,7 @@ function createCLIParser(argv: string[]) {
             ),
             services: configParam.services,
             unsafe: configParam.unsafe?.bindings,
+            dispatch_namespaces: configParam.dispatch_namespaces,
           };
         }
 
@@ -1741,6 +1750,7 @@ function createCLIParser(argv: string[]) {
             ),
             services: config.services,
             unsafe: config.unsafe?.bindings,
+            dispatch_namespaces: config.dispatch_namespaces,
           }}
           crons={config.triggers.crons}
           inspectorPort={await getPort({ port: 9229 })}
@@ -1908,7 +1918,7 @@ function createCLIParser(argv: string[]) {
                 scriptName,
                 envName: args.env,
                 legacyEnv: isLegacyEnv(config),
-              })
+              });
               const url = `${baseUrl}/secrets`;
 
               return await fetchResult(url, {
@@ -1929,38 +1939,35 @@ function createCLIParser(argv: string[]) {
                 scriptName,
                 envName: args.env,
                 legacyEnv: isLegacyEnv(config),
-              })
-              await fetchResult(
-                url,
-                {
-                  method: "PUT",
-                  body: createWorkerUploadForm({
+              });
+              await fetchResult(url, {
+                method: "PUT",
+                body: createWorkerUploadForm({
+                  name: scriptName,
+                  main: {
                     name: scriptName,
-                    main: {
-                      name: scriptName,
-                      content: `export default { fetch() {} }`,
-                      type: "esm",
-                    },
-                    bindings: {
-                      kv_namespaces: [],
-                      vars: {},
-                      durable_objects: { bindings: [] },
-                      r2_buckets: [],
-                      services: [],
-                      dispatch_namespaces: [],
-                      wasm_modules: {},
-                      text_blobs: {},
-                      data_blobs: {},
-                      unsafe: [],
-                    },
-                    modules: [],
-                    migrations: undefined,
-                    compatibility_date: undefined,
-                    compatibility_flags: undefined,
-                    usage_model: undefined,
-                  }),
-                }
-              );
+                    content: `export default { fetch() {} }`,
+                    type: "esm",
+                  },
+                  bindings: {
+                    kv_namespaces: [],
+                    vars: {},
+                    durable_objects: { bindings: [] },
+                    r2_buckets: [],
+                    services: [],
+                    dispatch_namespaces: [],
+                    wasm_modules: {},
+                    text_blobs: {},
+                    data_blobs: {},
+                    unsafe: [],
+                  },
+                  modules: [],
+                  migrations: undefined,
+                  compatibility_date: undefined,
+                  compatibility_flags: undefined,
+                  usage_model: undefined,
+                }),
+              });
             };
 
             function isMissingWorkerError(e: unknown): e is { code: 10007 } {
@@ -2040,7 +2047,7 @@ function createCLIParser(argv: string[]) {
                 scriptName,
                 envName: args.env,
                 legacyEnv: isLegacyEnv(config),
-              })
+              });
               const url = `${baseUrl}/secrets`;
 
               await fetchResult(`${url}/${args.key}`, { method: "DELETE" });
@@ -2081,7 +2088,7 @@ function createCLIParser(argv: string[]) {
               scriptName,
               envName: args.env,
               legacyEnv: isLegacyEnv(config),
-            })
+            });
             const url = `${baseUrl}/secrets`;
 
             logger.log(JSON.stringify(await fetchResult(url), null, "  "));
@@ -2679,16 +2686,12 @@ function createCLIParser(argv: string[]) {
     }
   );
 
-  wrangler.command(
-    "dispatch-namespace",
-    false,
-    (dispatchYargs) => {
-      return dispatchYargs
-        .command(subHelp)
-        .command(createNamespaceCommand)
-        .command(deleteNamespaceCommand)
-    },
-  );
+  wrangler.command("dispatch-namespace", false, (dispatchYargs) => {
+    return dispatchYargs
+      .command(subHelp)
+      .command(createNamespaceCommand)
+      .command(deleteNamespaceCommand);
+  });
 
   wrangler.command("r2", "📦 Interact with an R2 store", (r2Yargs) => {
     return r2Yargs

@@ -38,7 +38,7 @@ function makeCreateTailUrl(
     accountId,
     scriptName: workerName,
     envName: env,
-  })
+  });
 
   return `${baseUrl}/tails`;
 }
@@ -63,7 +63,7 @@ function makeDeleteTailUrl(
     accountId,
     scriptName: workerName,
     envName: env,
-  })
+  });
 
   return `${baseUrl}/tails/${tailId}`;
 }

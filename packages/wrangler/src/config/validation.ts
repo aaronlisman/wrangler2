@@ -1591,4 +1591,3 @@ const validateNamespaceBinding: ValidatorFn = (diagnostics, field, value) => {
   }
   return isValid;
 };
-

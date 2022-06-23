@@ -1,7 +1,10 @@
 import { URL } from "node:url";
 import { fetch } from "undici";
 import { fetchResult } from "./cfetch";
-import { createWorkerUploadForm, getWorkerUrl } from "./create-worker-upload-form";
+import {
+  createWorkerUploadForm,
+  getWorkerUrl,
+} from "./create-worker-upload-form";
 import { logger } from "./logger";
 import type { CfAccount, CfWorkerContext, CfWorkerInit } from "./worker";
 
@@ -117,7 +120,7 @@ async function createPreviewToken(
     scriptName: scriptId,
     envName: ctx.env,
     legacyEnv: ctx.legacyEnv,
-  })
+  });
   const url = `${baseUrl}/edge-preview`;
 
   const mode: CfPreviewMode = ctx.zone

@@ -1,9 +1,6 @@
 import { randomUUID } from "crypto";
 import { mockAccountId, mockApiToken } from "./helpers/mock-account-id";
-import {
-  setMockResponse,
-  unsetAllMocks,
-} from "./helpers/mock-cfetch";
+import { setMockResponse, unsetAllMocks } from "./helpers/mock-cfetch";
 import { mockConsoleMethods } from "./helpers/mock-console";
 import { runInTempDir } from "./helpers/run-in-tmp";
 import { runWrangler } from "./helpers/run-wrangler";

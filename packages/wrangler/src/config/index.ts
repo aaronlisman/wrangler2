@@ -170,7 +170,6 @@ export function printBindings(bindings: CfWorkerInit["bindings"]) {
     output.push({
       type: "Dispatch Namespaces",
       entries: dispatch_namespaces.map(({ binding, namespace }) => {
-
         return {
           key: binding,
           value: namespace,

@@ -260,10 +260,9 @@ export default async function publish(props: Props): Promise<void> {
 
   const namespaceName = props.namespaceName ?? config.namespace_name;
   // if we are uploading to a namespace we won't be deploying to routes or triggers, give a warning
-  if (namespaceName && (
-      (routes && routes.length > 0)
-      || (triggers && triggers.length > 0)
-    )
+  if (
+    namespaceName &&
+    ((routes && routes.length > 0) || (triggers && triggers.length > 0))
   ) {
     logger.warn(
       `Publishing to namespace '${namespaceName}': one or more routes or cron triggers are defined that will not be deployed.`
@@ -271,7 +270,8 @@ export default async function publish(props: Props): Promise<void> {
   }
 
   // deployToWorkersDev defaults to true only if there aren't any routes or a namespace defined
-  const deployToWorkersDev = config.workers_dev ?? (routes.length === 0 && !namespaceName);
+  const deployToWorkersDev =
+    config.workers_dev ?? (routes.length === 0 && !namespaceName);
   if (namespaceName && deployToWorkersDev) {
     logger.warn(
       `Publishing to namespace '${namespaceName}': 'deploy to workers.dev' was requested, but the script will not be published.`
@@ -491,7 +491,12 @@ export default async function publish(props: Props): Promise<void> {
   if (namespaceName) {
     // namespaced workers aren't deployed to workers.dev, routes, or triggers.
     // no publishing needs to be done, so we can bail early
-    logger.log("Uploaded", workerName, `to namespace '${namespaceName}'`, formatTime(uploadMs));
+    logger.log(
+      "Uploaded",
+      workerName,
+      `to namespace '${namespaceName}'`,
+      formatTime(uploadMs)
+    );
     return;
   }
 
